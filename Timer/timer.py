@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -- coding: utf-8 --
 
 """
 A simple countdown timer command for Alfred.app that
@@ -37,24 +38,21 @@ def main():
     minutes = interval / 60
     seconds = interval % 60
 
-    label = ' '.join(sys.argv[2:])
-    title = 'Timer started' + (': %s' % label.capitalize() if label else '.')
+    label = u' '.join([s.decode('utf-8') for s in sys.argv[2:]])
+    title = u'Timer started' + (u': %s' % label.capitalize() if label else u'.')
 
     if minutes and seconds:
-        notify(title, "I'll notify you in %i:%.2i." % (minutes, seconds))
-        passed_time = '%i:%.2i have passed.' % (minutes, seconds)
+        notify(title, u"I'll notify you in %i:%.2i." % (minutes, seconds))
+        passed_time = u'%i:%.2i have passed.' % (minutes, seconds)
     elif minutes:
-        notify(title, "I'll notify you in %i %s." % (minutes,
-               'minute' if minutes == 1 else 'minutes'))
-        passed_time = '%i %s passed.' % (minutes,
-                      'minute has' if minutes == 1 else 'minutes have')
+        notify(title, u"I'll notify you in %i %s." % (minutes, u'minute' if minutes == 1 else u'minutes'))
+        passed_time = u'%i %s passed.' % (minutes, u'minute has' if minutes == 1 else u'minutes have')
     else:
-        notify(title, "I'll notify you in %i seconds." % seconds)
-        passed_time = '%i seconds have passed.' % seconds
+        notify(title, u"I'll notify you in %i seconds." % seconds)
+        passed_time = u'%i seconds have passed.' % seconds
 
     time.sleep(interval)
-    notify("Time's up" + (': %s' % label.capitalize() if label else '.'),
-           passed_time)
+    notify(u"Time's up" + (': %s' % label.capitalize() if label else u'.'), passed_time)
     play_sound('alarm.m4a')
 
 
@@ -126,11 +124,8 @@ def swizzled_bundleIdentifier(self, original):
     Original idea for this approach by Norio Numura:
         https://github.com/norio-nomura/usernotification
     """
-    # Return Alfred's bundle identifier to display the Alfred.app logo.
-    if 'Alfred 2' in os.getcwd():
-        return 'com.runningwithcrayons.Alfred-2'
-    else:
-        return 'com.alfredapp.Alfred'
+    # Return Alfred's bundle identifier to display the Alfred.app logo
+    return 'com.runningwithcrayons.Alfred-3'
 
 
 def notify(title, subtitle=None):
@@ -138,10 +133,11 @@ def notify(title, subtitle=None):
     NSUserNotification = objc.lookUpClass('NSUserNotification')
     NSUserNotificationCenter = objc.lookUpClass('NSUserNotificationCenter')
     if not NSUserNotification or not NSUserNotificationCenter:
+        print('no nsusernotification')
         return
 
     notification = NSUserNotification.alloc().init()
-    notification.setTitle_(str(title))
+    notification.setTitle_(title)
     if subtitle:
         notification.setSubtitle_(str(subtitle))
 
